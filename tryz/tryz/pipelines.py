@@ -22,7 +22,6 @@ class TryzPipeline:
         self.cur = self.conn.cursor()
         
 
-    
     def process_item(self, item, spider):
         self.cur.execute(" insert into name(Company_name,name_of_plan,link) values(%s,%s,%s);"
         ,(item['company_name'],str(item['fund_name']),str(item['link'])))
@@ -30,11 +29,14 @@ class TryzPipeline:
         self.cur.execute("SET FOREIGN_KEY_CHECKS = 0;")
         self.conn.commit()
         self.cur.execute(
-            "insert into returns(Company_name,name_of_plan,cap_size,type_of_investment,ROI,risk,min_investment) values(%s,%s,%s,%s,%s,%s,%s);"
-        ,(str(item['company_name']),str(item['fund_name']),float(item['val']),str(item['type']),float(item['roi']),'HIGH',float(0))
+            "insert into returns(Company_name,name_of_plan,cap_size,type_of_investment,ROI,risk,min_investment,ROI_1M,ROI_3M,ROI_6M,ROI_1Y,ROI_3Y,ROI_5Y,ROI_10Y,cat,sub_cat) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+        ,(str(item['company_name']),str(item['fund_name']),float(item['val']),str(item['type']),float(item['roi']),item['risk'],float(0),str(item['roi_1m']),str(item['roi_3m']),str(item['roi_6m']),str(item['roi_1y']),str(item['roi_3y']),str(item['roi_5y']),str(item['roi_10y']),str(item['cat']),str(item['sub_cat']),)
         )
         self.conn.commit()
         self.cur.execute("SET FOREIGN_KEY_CHECKS = 1;")
+        self.conn.commit()
+        self.cur.execute(" insert into duration(Company_name,Name_of_plan,time_for_maturity,age,lockdown) values(%s,%s,%s,%s,%s);"
+        ,(item['company_name'],str(item['fund_name']),str(0),str(item['age']),str(item['lockdown_duration'])))
         self.conn.commit()
         
 
