@@ -73,6 +73,13 @@ class TryalSpider(scrapy.Spider):
                 roi=float(0)
         return roi
     
+    def clean_val(v_val):
+        if(v_val=="" or v_val==None):
+            val=float(0)
+        else:
+            v_val=v_val.replace(',','')
+            val=float((v_val.split(' ')[0])[1:])
+        return val
     
     def parse(self, response):
         dic={'Aditya':'Aditya Birla','Axis':'Axis','Baroda':'Baroda','Bandhan':'Bandhan','Canara':'Canara','DSP':'DSP'
@@ -82,9 +89,10 @@ class TryalSpider(scrapy.Spider):
           ,'Tata':'Tata','UTI':'UTI','SBI':'SBI','IDFC':'IDFC','HSBC':'HSBC'
           }
         item=TryzItem()
-        item['fund_name']=response.xpath('/html/body/div[1]/div[9]/div[1]/div[1]/div/div/div[2]/div[1]/h1/text()').get()
-        v_val=response.xpath('/html/body/div[1]/div[10]/div/div[1]/div[4]/div/div/div/table/tbody/tr[5]/td[2]/span[2]/text()').get()
-        v_roi=str(response.xpath('/html/body/div[1]/div[9]/div[2]/div/div/div/div/div/div/div[2]/p[3]/span[1]/text()').get())
+        item['fund_name']=response.xpath('/html/body/div/div[6]/div[4]/div[1]/div[1]/div/div/div[2]/div[1]/h1/text()').get()
+        v_val=response.xpath('/html/body/div/div[6]/div[5]/div/div[1]/div[4]/div/div/div/table/tbody/tr[5]/td[2]/span[2]/text()').get()
+        item['val']=TryalSpider.clean_val(v_val)
+        v_roi=str(response.xpath('/html/body/div/div[6]/div[4]/div[2]/div/div/div/div/div/div/div[2]/p[3]/span[1]/text()').get())
         v_link=str(response)
         v_link=v_link[5:]
         v_link=v_link[:-1]
@@ -95,23 +103,32 @@ class TryalSpider(scrapy.Spider):
         item['type']=v_link[3]
         item['company_name']=dic.get(str((v_fund.split(' '))[0]))
         item['roi']=TryalSpider.clean_roi(v_roi)
-        item['roi_1m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div[1]/div[10]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[1]/td[2]/span/text()').get()))
-        item['roi_3m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div[1]/div[10]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[2]/td[2]/span/text()').get()))
-        item['roi_6m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div[1]/div[10]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[3]/td[2]/span/text()').get()))
-        item['roi_1y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div[1]/div[10]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[4]/td[2]/span/text()').get()))
-        item['roi_3y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div[1]/div[10]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[5]/td[2]/span/text()').get()))
-        item['roi_5y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div[1]/div[10]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[6]/td[2]/span/text()').get()))
-        item['roi_10y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div[1]/div[10]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[7]/td[2]/span/text()').get()))
-        item['age']=response.xpath('/html/body/div[1]/div[10]/div/div[1]/div[4]/div/div/div/table/tbody/tr[7]/td[2]/text()').get()
-        item['risk']=response.xpath('/html/body/div[1]/div[10]/div/div[3]/div[1]/div/div/p/span/text()').get()
-        item['lockdown_duration']=response.xpath('/html/body/div[1]/div[10]/div/div[1]/div[4]/div/div/div/table/tbody/tr[6]/td[2]/text()').get()
-        item['cat']=response.xpath('/html/body/div[1]/div[9]/div[1]/div[1]/div/div/div[2]/div[1]/div/div[1]/a[1]/span/text()').get()
-        item['sub_cat']=response.xpath('/html/body/div[1]/div[9]/div[1]/div[1]/div/div/div[2]/div[1]/div/div[1]/a[2]/span/text()').get()
-        if(v_val==""):
-            item['val']=float(0)
-        else:
-            v_val=v_val.replace(',','')
-            item['val']=float((v_val.split(' ')[0])[1:])
+        item['roi_1m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[1]/td[2]/span/text()').get()))
+        item['roi_3m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[2]/td[2]/span/text()').get()))
+        item['roi_6m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[3]/td[2]/span/text()').get()))
+        item['roi_1y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[4]/td[2]/span/text()').get()))
+        item['roi_3y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[5]/td[2]/span/text()').get()))
+        item['roi_5y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[6]/td[2]/span/text()').get()))
+        item['roi_10y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[7]/td[2]/span/text()').get()))
+        item['cat_avg_1m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[1]/td[3]/span/text()').get()))
+        item['cat_avg_3m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[2]/td[3]/span/text()').get()))
+        item['cat_avg_6m']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[3]/td[3]/span/text()').get()))
+        item['cat_avg_1y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[4]/td[3]/span/text()').get()))
+        item['cat_avg_3y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[5]/td[3]/span/text()').get()))
+        item['cat_avg_5y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[6]/td[3]/span/text()').get()))
+        item['cat_avg_10y']=TryalSpider.clean_roi(str(response.xpath('/html/body/div/div[6]/div[5]/div/div[2]/section[2]/div/div/div/div[1]/div/table/tbody/tr[7]/td[3]/span/text()').get()))
+        item['age']=response.xpath('/html/body/div/div[6]/div[5]/div/div[1]/div[4]/div/div/div/table/tbody/tr[7]/td[2]/text()').get()
+        item['risk']=response.xpath('/html/body/div/div[6]/div[5]/div/div[3]/div[1]/div/div/p/span/text()').get()
+        item['lockdown_duration']=response.xpath('/html/body/div/div[6]/div[5]/div/div[1]/div[4]/div/div/div/table/tbody/tr[6]/td[2]/text()').get()
+        item['cat']=response.xpath('/html/body/div/div[6]/div[4]/div[1]/div[1]/div/div/div[2]/div[1]/div/div[1]/a[1]/span/text()').get()
+        item['sub_cat']=response.xpath('/html/body/div/div[6]/div[4]/div[1]/div[1]/div/div/div[2]/div[1]/div/div[1]/a[2]/span/text()').get()
+        item['vro']=response.xpath('/html/body/div/div[6]/div[5]/div/div[1]/div[4]/div/div/div/table/tbody/tr[2]/td[2]/span/span/span/text()').get()
+        item['sip_min']=float((response.xpath('/html/body/div/div[6]/div[5]/div/div[1]/div[4]/div/div/div/table/tbody/tr[9]/td[2]/p[1]/span[2]/text()').get()).split("/")[0])
+        item['lumpsum_min']=response.xpath('/html/body/div/div[6]/div[5]/div/div[1]/div[4]/div/div/div/table/tbody/tr[9]/td[2]/p[2]/span[2]/text()').get()
+        item['nav']=response.xpath('/html/body/div/div[6]/div[4]/div[2]/div/div/div/div/div/div/div[1]/p[2]/span[1]/text()').get()
+        item['aum']=TryalSpider.clean_val(response.xpath('/html/body/div/div[6]/div[5]/div/div[3]/div[3]/div/header/div[2]/div[2]/p[2]/text()').get())
+        # item["aum"]=0  
+        
         print(item)
         yield item
         
